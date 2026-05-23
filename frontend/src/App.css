@@ -1,0 +1,224 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+}
+
+.app {
+    display: flex;
+}
+
+.main-content {
+    flex: 1;
+    margin-left: 260px;
+    min-height: 100vh;
+    background-color: #f5f7fa;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 32px;
+    background-color: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+    .header h1 {
+        margin: 0;
+        font-size: 1.8rem;
+        color: #2c3e50;
+    }
+
+.theme-toggle {
+    cursor: pointer;
+    padding: 8px 16px;
+    background-color: #f0f0f0;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.content {
+    padding: 32px;
+}
+
+.recharts-wrapper, .recharts-surface, .recharts-text {
+    font-family: 'Segoe UI', 'Arial', sans-serif !important;
+}
+
+:root {
+    --bg-primary: #f5f7fa;
+    --bg-secondary: white;
+    --text-primary: #2c3e50;
+    --text-secondary: #7f8c8d;
+    --border: #e0e0e0;
+    --card-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    --hover-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    --sidebar-bg: #1a1a2e;
+    --sidebar-text: #a8b2d1;
+    --sidebar-hover: #0f3460;
+    --sidebar-active: #4CAF50;
+}
+
+[data-theme="dark"] {
+    --bg-primary: #1a1a2e;
+    --bg-secondary: #16213e;
+    --text-primary: #ffffff;
+    --text-secondary: #a8b2d1;
+    --border: #0f3460;
+    --card-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    --hover-shadow: 0 5px 20px rgba(0,0,0,0.4);
+    --sidebar-bg: #0f3460;
+    --sidebar-text: #ffffff;
+    --sidebar-hover: #1a1a2e;
+    --sidebar-active: #4CAF50;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+.main-content {
+    background-color: var(--bg-primary);
+}
+
+.header {
+    background-color: var(--bg-secondary);
+    box-shadow: var(--card-shadow);
+}
+
+    .header h1 {
+        color: var(--text-primary);
+    }
+
+.stat-card, .chart-container, .prediction-form, .prediction-result, .metric-card, .table-container {
+    background-color: var(--bg-secondary) !important;
+    box-shadow: var(--card-shadow) !important;
+}
+
+.stat-info h3 {
+    color: var(--text-secondary) !important;
+}
+
+.stat-info p, .metric-value, .data-table td {
+    color: var(--text-primary) !important;
+}
+
+.data-table th {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+.data-table tr:hover {
+    background-color: var(--bg-primary) !important;
+}
+
+.period-selector button {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+    .period-selector button:hover {
+        background-color: var(--border);
+    }
+
+.form-group label {
+    color: var(--text-primary) !important;
+}
+
+.form-group input, .form-group select {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .theme-toggle {
+    background-color: #0f3460;
+    color: white;
+    border: 1px solid #4CAF50;
+}
+
+    [data-theme="dark"] .theme-toggle:hover {
+        background-color: #1a1a2e;
+    }
+
+    [data-theme="dark"] .theme-toggle span {
+        color: white;
+    }
+
+.theme-toggle {
+    background-color: #f0f0f0;
+    color: #2c3e50;
+    border: 1px solid #ddd;
+}
+
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .stat-period-card,
+[data-theme="dark"] .metric-card,
+[data-theme="dark"] .prediction-form,
+[data-theme="dark"] .prediction-result,
+[data-theme="dark"] .result-card {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+    [data-theme="dark"] .stat-card h3,
+    [data-theme="dark"] .stat-card p,
+    [data-theme="dark"] .stat-period-card .value-label,
+    [data-theme="dark"] .stat-period-card .value-number,
+    [data-theme="dark"] .metric-card h3,
+    [data-theme="dark"] .metric-card .metric-value,
+    [data-theme="dark"] .prediction-form label,
+    [data-theme="dark"] .prediction-result h3,
+    [data-theme="dark"] .result-card .result-value {
+        color: var(--text-primary) !important;
+    }
+
+[data-theme="dark"] .period-selector button {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+}
+
+    [data-theme="dark"] .period-selector button.active {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+[data-theme="dark"] .data-page h2,
+[data-theme="dark"] .prediction-page h2,
+[data-theme="dark"] .metrics-page h2 {
+    color: white !important;
+}
+
+[data-theme="dark"] .data-table th,
+[data-theme="dark"] .data-table td {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .data-table {
+    background-color: var(--bg-secondary) !important;
+}
+
+[data-theme="dark"] .filter-section input {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] input[type="date"] {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border-color: var(--border);
+}
+
+    [data-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator {
+        filter: invert(1);
+    }

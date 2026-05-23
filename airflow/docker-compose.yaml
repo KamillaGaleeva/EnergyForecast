@@ -1,0 +1,59 @@
+version: '3.8'
+services:
+  metadb:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    networks:
+      - airflow
+    restart: unless-stopped
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 5s
+      retries: 5
+
+  scheduler:
+    image: apache/airflow:2.8.1-python3.11
+    command: scheduler
+    depends_on:
+      metadb:
+        condition: service_healthy
+    networks:
+      - airflow
+    restart: unless-stopped
+    volumes:
+      - ./airflow_home:/opt/airflow
+      - ../ml_pipeline:/opt/airflow/ml_pipeline  
+      - ../data:/opt/airflow/data               
+      - ../models:/opt/airflow/models         
+    environment:
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@metadb:5432/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
+
+  webserver:
+    image: apache/airflow:2.8.1-python3.11
+    command: webserver
+    depends_on:
+      metadb:
+        condition: service_healthy
+    networks:
+      - airflow
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    volumes:
+      - ./airflow_home:/opt/airflow
+      - ../ml_pipeline:/opt/airflow/ml_pipeline
+      - ../data:/opt/airflow/data
+      - ../models:/opt/airflow/models
+    environment:
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@metadb:5432/airflow
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'False'
+
+networks:
+  airflow:
+    driver: bridge

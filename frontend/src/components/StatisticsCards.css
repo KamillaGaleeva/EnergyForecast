@@ -1,0 +1,106 @@
+﻿.statistics-section {
+    margin: 30px 0;
+    padding: 20px;
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+}
+
+    .statistics-section h3 {
+        margin: 0 0 20px 0;
+        color: var(--text-primary);
+        font-size: 1.3rem;
+    }
+
+.statistics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.stat-period-card {
+    background: var(--bg-primary);
+    padding: 20px;
+    border-radius: 12px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+    .stat-period-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--hover-shadow);
+    }
+
+.period-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+}
+
+.period-icon {
+    font-size: 1.5rem;
+    color: #4CAF50;
+}
+
+.period-header h4 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.period-values {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.value-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+}
+
+.value-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.value-number {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.change {
+    padding-top: 10px;
+    border-top: 1px dashed var(--border);
+}
+
+    .change.positive {
+        color: #4CAF50;
+    }
+
+    .change.negative {
+        color: #FF6B6B;
+    }
+
+.percent {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-left: 5px;
+}
+
+.stats-loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+    .statistics-grid {
+        grid-template-columns: 1fr;
+    }
+}
