@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+п»їfrom datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
@@ -24,18 +24,18 @@ default_args = {
 dag = DAG(
     'retrain_pipeline',
     default_args=default_args,
-    description='Автоматическое дообучение модели',
+    description='РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРµ РґРѕРѕР±СѓС‡РµРЅРёРµ РјРѕРґРµР»Рё',
     schedule_interval='0 2 * * *', 
     catchup=False,
     tags=['ml', 'retraining'],
 )
 
 def process_data_func(**context):
-    """Оборачивает функцию process_new_data для использования в PythonOperator"""
+    """РћР±РѕСЂР°С‡РёРІР°РµС‚ С„СѓРЅРєС†РёСЋ process_new_data РґР»СЏ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РІ PythonOperator"""
     result = process_new_data()
     if not result:
-        raise Exception("Нет новых данных для обработки")
-    return "Данные обработаны"
+        raise Exception("РќРµС‚ РЅРѕРІС‹С… РґР°РЅРЅС‹С… РґР»СЏ РѕР±СЂР°Р±РѕС‚РєРё")
+    return "Р”Р°РЅРЅС‹Рµ РѕР±СЂР°Р±РѕС‚Р°РЅС‹"
 
 process_task = PythonOperator(
     task_id='process_new_data',
@@ -44,14 +44,14 @@ process_task = PythonOperator(
 )
 
 def train_func(**context):
-    """Ищет последние обработанные данные и запускает обучение"""
+    """РС‰РµС‚ РїРѕСЃР»РµРґРЅРёРµ РѕР±СЂР°Р±РѕС‚Р°РЅРЅС‹Рµ РґР°РЅРЅС‹Рµ Рё Р·Р°РїСѓСЃРєР°РµС‚ РѕР±СѓС‡РµРЅРёРµ"""
     latest_data = find_latest_data()
     if latest_data is None:
-        raise Exception("Нет данных для обучения")
+        raise Exception("РќРµС‚ РґР°РЅРЅС‹С… РґР»СЏ РѕР±СѓС‡РµРЅРёСЏ")
     
     model_path, metrics = train_model(latest_data)
     context['task_instance'].xcom_push(key='model_path', value=str(model_path))
-    return "Модель обучена"
+    return "РњРѕРґРµР»СЊ РѕР±СѓС‡РµРЅР°"
 
 train_task = PythonOperator(
     task_id='train_model',
@@ -60,9 +60,9 @@ train_task = PythonOperator(
 )
 
 def evaluate_func(**context):
-    """Сравнивает новую модель с текущей продакшн-моделью"""
+    """РЎСЂР°РІРЅРёРІР°РµС‚ РЅРѕРІСѓСЋ РјРѕРґРµР»СЊ СЃ С‚РµРєСѓС‰РµР№ РїСЂРѕРґР°РєС€РЅ-РјРѕРґРµР»СЊСЋ"""
     result = compare_models()
-    return f"Результат сравнения: {result}"
+    return f"Р РµР·СѓР»СЊС‚Р°С‚ СЃСЂР°РІРЅРµРЅРёСЏ: {result}"
 
 evaluate_task = PythonOperator(
     task_id='evaluate_model',
