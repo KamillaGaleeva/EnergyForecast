@@ -1,5 +1,5 @@
 ﻿import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import SHAPChart from '../components/SHAPChart';
 import './PredictionPage.css';
 
@@ -16,10 +16,7 @@ const PredictionPage = () => {
     const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = async (e) => {
@@ -27,9 +24,8 @@ const PredictionPage = () => {
         setLoading(true);
         setPrediction(null);
         setExplanation(null);
-
         try {
-            const response = await axios.post('http://127.0.0.1:8000/explain', formData);
+            const response = await api.post('/explain', formData);
             setPrediction(response.data.prediction);
             setExplanation(response.data.explanation);
         } catch (error) {
@@ -43,73 +39,31 @@ const PredictionPage = () => {
     return (
         <div className="prediction-page">
             <h2>Прогнозирование потребления</h2>
-
             <div className="prediction-container">
                 <form onSubmit={handleSubmit} className="prediction-form">
                     <div className="form-group">
                         <label>Потребление 12ч назад (кВт·ч)</label>
-                        <input
-                            type="number"
-                            name="target_lag_12h"
-                            value={formData.target_lag_12h}
-                            onChange={handleChange}
-                            placeholder="например: 687.00"
-                            step="0.01"
-                            required
-                        />
+                        <input type="number" name="target_lag_12h" value={formData.target_lag_12h} onChange={handleChange} placeholder="например: 687.00" step="0.01" required />
                     </div>
-
                     <div className="form-group">
                         <label>Потребление 48ч назад (кВт·ч)</label>
-                        <input
-                            type="number"
-                            name="target_lag_48h"
-                            value={formData.target_lag_48h}
-                            onChange={handleChange}
-                            placeholder="например: 610.00"
-                            step="0.01"
-                            required
-                        />
+                        <input type="number" name="target_lag_48h" value={formData.target_lag_48h} onChange={handleChange} placeholder="например: 610.00" step="0.01" required />
                     </div>
-
                     <div className="form-group">
                         <label>Потребление 14 дней назад (кВт·ч)</label>
-                        <input
-                            type="number"
-                            name="target_lag_336h"
-                            value={formData.target_lag_336h}
-                            onChange={handleChange}
-                            placeholder="например: 12.00"
-                            step="0.01"
-                            required
-                        />
+                        <input type="number" name="target_lag_336h" value={formData.target_lag_336h} onChange={handleChange} placeholder="например: 12.00" step="0.01" required />
                     </div>
-
                     <div className="form-group">
                         <label>Потребление 72ч назад (кВт·ч)</label>
-                        <input
-                            type="number"
-                            name="target_lag_72h"
-                            value={formData.target_lag_72h}
-                            onChange={handleChange}
-                            placeholder="например: 560.00"
-                            step="0.01"
-                            required
-                        />
+                        <input type="number" name="target_lag_72h" value={formData.target_lag_72h} onChange={handleChange} placeholder="например: 560.00" step="0.01" required />
                     </div>
-
                     <div className="form-group">
                         <label>Режим работы</label>
-                        <select
-                            name="is_consumption"
-                            value={formData.is_consumption}
-                            onChange={handleChange}
-                        >
+                        <select name="is_consumption" value={formData.is_consumption} onChange={handleChange}>
                             <option value={1}>🏠 Потребление</option>
                             <option value={0}>☀️ Производство</option>
                         </select>
                     </div>
-
                     <button type="submit" className="predict-btn" disabled={loading}>
                         {loading ? '⏳ Загрузка...' : '🔮 Получить прогноз'}
                     </button>

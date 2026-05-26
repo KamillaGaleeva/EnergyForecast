@@ -12,7 +12,11 @@ import {
 import { getConsumptionData, getPredictions } from '../services/api';
 import './ConsumptionChart.css';
 
+const PERIOD_HOURS = { '24h': 24, '7d': 168, '30d': 720 };
+
 const ConsumptionChart = () => {
+    const [allConsumption, setAllConsumption] = useState([]);
+    const [allPredictions, setAllPredictions] = useState([]);
     const [data, setData] = useState([]);
     const [period, setPeriod] = useState('24h');
     const [loading, setLoading] = useState(true);
@@ -21,44 +25,49 @@ const ConsumptionChart = () => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-
-                const consumptionResponse = await getConsumptionData();
-                const predictionsResponse = await getPredictions();
-
-                const consumptionMap = {};
-                consumptionResponse.data.forEach(item => {
-                    const date = new Date(item.timestamp);
-                    const hour = date.getHours().toString().padStart(2, '0') + ':00';
-                    consumptionMap[hour] = item.consumption_kwh;
-                });
-
-                const forecastMap = {};
-                predictionsResponse.data.forEach(item => {
-                    const date = new Date(item.timestamp);
-                    const hour = date.getHours().toString().padStart(2, '0') + ':00';
-                    forecastMap[hour] = item.predicted_value;
-                });
-
-                const chartData = [];
-                for (let i = 0; i < 24; i++) {
-                    const hour = i.toString().padStart(2, '0') + ':00';
-                    chartData.push({
-                        hour,
-                        actual: consumptionMap[hour] || 0,
-                        forecast: forecastMap[hour] || 0,
-                    });
-                }
-
-                setData(chartData);
+                const [consumptionResponse, predictionsResponse] = await Promise.all([
+                    getConsumptionData(),
+                    getPredictions(),
+                ]);
+                setAllConsumption(consumptionResponse.data);
+                setAllPredictions(predictionsResponse.data);
             } catch (error) {
                 console.error('Ошибка загрузки данных:', error);
             } finally {
                 setLoading(false);
             }
         };
-
         fetchData();
-    }, [period]); 
+    }, []);
+
+    useEffect(() => {
+        if (!allConsumption.length && !allPredictions.length) return;
+
+        const hours = PERIOD_HOURS[period];
+        const cutoff = new Date(Date.now() - hours * 60 * 60 * 1000);
+
+        const filtered = allConsumption.filter(
+            item => new Date(item.timestamp) >= cutoff
+        );
+        const filteredPred = allPredictions.filter(
+            item => new Date(item.timestamp) >= cutoff
+        );
+
+        const predMap = {};
+        filteredPred.forEach(item => {
+            predMap[item.timestamp] = item.predicted_value;
+        });
+
+        const chartData = filtered.map(item => ({
+            label: period === '24h'
+                ? new Date(item.timestamp).getHours().toString().padStart(2, '0') + ':00'
+                : new Date(item.timestamp).toLocaleDateString('ru-RU', { month: 'short', day: 'numeric' }),
+            actual: item.consumption_kwh,
+            forecast: predMap[item.timestamp] ?? null,
+        }));
+
+        setData(chartData);
+    }, [period, allConsumption, allPredictions]);
 
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
@@ -71,64 +80,40 @@ const ConsumptionChart = () => {
                 }}>
                     <p style={{ margin: 0, color: '#2c3e50' }}>Время: {label}</p>
                     <p style={{ margin: 0, color: '#4CAF50' }}>Факт: {payload[0]?.value} кВт·ч</p>
-                    <p style={{ margin: 0, color: '#FF6B6B' }}>Прогноз: {payload[1]?.value} кВт·ч</p>
+                    {payload[1]?.value != null && (
+                        <p style={{ margin: 0, color: '#FF6B6B' }}>Прогноз: {payload[1].value} кВт·ч</p>
+                    )}
                 </div>
             );
         }
         return null;
     };
 
-    if (loading) {
-        return <div className="chart-container">Загрузка данных...</div>;
-    }
+    if (loading) return <div className="chart-container">Загрузка данных...</div>;
 
     return (
         <div className="chart-container">
             <h2>Потребление и прогноз</h2>
             <div className="period-selector">
-                <button
-                    className={period === '24h' ? 'active' : ''}
-                    onClick={() => setPeriod('24h')}
-                >
-                    24 часа
-                </button>
-                <button
-                    className={period === '7d' ? 'active' : ''}
-                    onClick={() => setPeriod('7d')}
-                >
-                    7 дней
-                </button>
-                <button
-                    className={period === '30d' ? 'active' : ''}
-                    onClick={() => setPeriod('30d')}
-                >
-                    30 дней
-                </button>
+                {[['24h', '24 часа'], ['7d', '7 дней'], ['30d', '30 дней']].map(([key, label]) => (
+                    <button
+                        key={key}
+                        className={period === key ? 'active' : ''}
+                        onClick={() => setPeriod(key)}
+                    >
+                        {label}
+                    </button>
+                ))}
             </div>
             <ResponsiveContainer width="100%" height={400}>
                 <LineChart data={data}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="hour" />
+                    <XAxis dataKey="label" />
                     <YAxis />
                     <Tooltip content={<CustomTooltip />} />
                     <Legend />
-                    <Line
-                        type="monotone"
-                        dataKey="actual"
-                        stroke="#4CAF50"
-                        strokeWidth={2}
-                        dot={false}
-                        name="Факт"
-                    />
-                    <Line
-                        type="monotone"
-                        dataKey="forecast"
-                        stroke="#FF6B6B"
-                        strokeWidth={2}
-                        strokeDasharray="5 5"
-                        dot={false}
-                        name="Прогноз"
-                    />
+                    <Line type="monotone" dataKey="actual" stroke="#4CAF50" strokeWidth={2} dot={false} name="Факт" />
+                    <Line type="monotone" dataKey="forecast" stroke="#FF6B6B" strokeWidth={2} strokeDasharray="5 5" dot={false} name="Прогноз" />
                 </LineChart>
             </ResponsiveContainer>
         </div>

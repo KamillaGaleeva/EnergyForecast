@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { getConsumptionData } from '../services/api';
+import api, { getConsumptionData } from '../services/api';
 import './DataPage.css';
 
 const DataPage = () => {
@@ -33,32 +33,21 @@ const DataPage = () => {
         formData.append('file', file);
 
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch('http://127.0.0.1:8000/upload-consumption', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                body: formData
+            const response = await api.post('/upload-consumption', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
-
-            const result = await response.json();
-            setUploadMessage(`✅ ${result.message}`);
-
+            setUploadMessage(`✅ ${response.data.message}`);
             const newData = await getConsumptionData();
             setData(newData.data);
-
         } catch (error) {
             setUploadMessage('❌ Ошибка загрузки файла');
         } finally {
             setUploading(false);
-            event.target.value = ''; 
+            event.target.value = '';
         }
     };
 
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleString('ru-RU');
-    };
+    const formatDate = (dateString) => new Date(dateString).toLocaleString('ru-RU');
 
     if (loading) return <div className="loading">Загрузка данных...</div>;
 
@@ -66,23 +55,14 @@ const DataPage = () => {
         <div className="data-page">
             <div className="data-header">
                 <h2>Данные потребления</h2>
-
-                {}
                 <div className="upload-csv-section">
                     <label className="upload-csv-btn">
                         📤 Загрузить CSV
-                        <input
-                            type="file"
-                            accept=".csv"
-                            onChange={handleCSVUpload}
-                            style={{ display: 'none' }}
-                            disabled={uploading}
-                        />
+                        <input type="file" accept=".csv" onChange={handleCSVUpload} style={{ display: 'none' }} disabled={uploading} />
                     </label>
                     {uploading && <span className="upload-status">Загрузка...</span>}
                     {uploadMessage && <div className="upload-message">{uploadMessage}</div>}
                 </div>
-
                 <div className="filter-section">
                     <input type="date" placeholder="От" />
                     <input type="date" placeholder="До" />

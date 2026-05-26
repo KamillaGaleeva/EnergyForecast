@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { FiTrendingUp, FiTrendingDown, FiCalendar, FiClock, FiSun } from 'react-icons/fi';
+import api from '../services/api';
+import { FiCalendar, FiClock, FiSun } from 'react-icons/fi';
 import './StatisticsCards.css';
 
 const StatisticsCards = () => {
@@ -10,7 +10,7 @@ const StatisticsCards = () => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:8000/statistics/comparison');
+                const response = await api.get('/statistics/comparison');
                 setStats(response.data);
             } catch (error) {
                 console.error('Ошибка загрузки статистики:', error);

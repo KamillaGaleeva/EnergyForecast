@@ -5,12 +5,17 @@ import './MetricsPage.css';
 const MetricsPage = () => {
     const [metrics, setMetrics] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [noData, setNoData] = useState(false);
 
     useEffect(() => {
         const fetchMetrics = async () => {
             try {
                 const response = await getModelMetrics(1);
-                setMetrics(response.data.metrics);
+                if (response.data.message) {
+                    setNoData(true);
+                } else {
+                    setMetrics(response.data.metrics);
+                }
             } catch (error) {
                 console.error('Ошибка загрузки метрик:', error);
             } finally {
@@ -21,6 +26,15 @@ const MetricsPage = () => {
     }, []);
 
     if (loading) return <div className="loading">Загрузка метрик...</div>;
+
+    if (noData) return (
+        <div className="metrics-page">
+            <h2>Метрики модели</h2>
+            <div className="metrics-info">
+                <p>Нет данных для расчёта метрик. Загрузите фактические значения в разделе «История прогнозов».</p>
+            </div>
+        </div>
+    );
 
     const metricItems = [
         { key: 'MAE', label: 'Средняя абсолютная ошибка', value: metrics?.MAE },
@@ -34,20 +48,18 @@ const MetricsPage = () => {
     return (
         <div className="metrics-page">
             <h2>Метрики модели</h2>
-
             <div className="metrics-grid">
                 {metricItems.map((metric) => (
                     <div key={metric.key} className="metric-card">
                         <h3>{metric.label}</h3>
                         <p className="metric-value">
-                            {metric.value !== undefined ? metric.value.toFixed(4) : '—'}
+                            {metric.value != null ? metric.value.toFixed(4) : '—'}
                         </p>
                     </div>
                 ))}
             </div>
-
             <div className="metrics-info">
-                <p> Метрики рассчитаны на основе исторических прогнозов</p>
+                <p>Метрики рассчитаны на основе исторических прогнозов</p>
             </div>
         </div>
     );

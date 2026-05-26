@@ -1,5 +1,5 @@
 ﻿import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import './AuthPages.css';
 
 const LoginPage = ({ onLogin, onNavigateToRegister }) => {
@@ -12,20 +12,10 @@ const LoginPage = ({ onLogin, onNavigateToRegister }) => {
         e.preventDefault();
         setError('');
         setLoading(true);
-
         try {
-            const response = await axios.post('http://127.0.0.1:8000/auth/login', {
-                username,
-                password
-            });
-
+            const response = await api.post('/auth/login', { username, password });
             localStorage.setItem('token', response.data.access_token);
-
-            if (onLogin) {
-                onLogin();
-            } else {
-                window.location.href = '/dashboard';
-            }
+            if (onLogin) onLogin();
         } catch (err) {
             setError('Неверный логин или пароль');
         } finally {

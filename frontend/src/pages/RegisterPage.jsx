@@ -1,5 +1,5 @@
 ﻿import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 import './AuthPages.css';
 
 const RegisterPage = ({ onRegister, onNavigateToLogin }) => {
@@ -13,13 +13,8 @@ const RegisterPage = ({ onRegister, onNavigateToLogin }) => {
         e.preventDefault();
         setError('');
         setLoading(true);
-
         try {
-            await axios.post('http://127.0.0.1:8000/auth/register', {
-                username,
-                password,
-                email: email || null
-            });
+            await api.post('/auth/register', { username, password, email: email || null });
             onRegister();
         } catch (err) {
             setError(err.response?.data?.detail || 'Ошибка регистрации');
